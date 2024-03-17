@@ -1,22 +1,16 @@
-<VirtualHost *:80>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/practica.com
-    Servername practica.com
-    ServerAlias www.practica.com
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
+#!/bin/bash
 
-
-<!DOCTYPE html>
+echo "Content-type: text/html"
+echo -e "
 <html>
-<head>
-    <title>Apache Server M08-UF1</title>
-</head>
-<body>
-    <h1>PS AUX Outputasdfsafasfasfdas</h1>
-    <pre>
-        
-    </pre>
-</body>
+    <head>
+        <title>Mi primera pagina dinamica</title>
+    </head>
+    <body>
+"
+whoami
+echo -e "  
+    </body>
 </html>
+"
+

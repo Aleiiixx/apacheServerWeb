@@ -17,6 +17,24 @@ echo "    <body>"
 echo "        <pre>"
 ps aux
 echo "        </pre>"
+echo "        <h2>Estado del servidor:</h2>"
+echo "        <h3>Recursos del servidor:</h3>"
+echo "        <pre>"
+echo "Carga de la CPU:"
+uptime | cut -d ":" -f 5
+echo "Memoria:"
+free -h
+echo "Espacio en disco:"
+df -h
+echo "        </pre>"
+echo "        <h3>Tiempo encendido (uptime):</h3>"
+echo "        <pre>"
+uptime
+echo "        </pre>"
+echo "        <h3>Últimos 10 logins:</h3>"
+echo "        <pre>"
+last -n 10
+echo "        </pre>"
 echo "        <form method='POST' action='/cgi-bin/script.sh'>"
 echo "            <label for='pid'>PID:</label>"
 echo "            <input type='text' id='pid' name='pid'>"
@@ -24,4 +42,3 @@ echo "            <input type='submit' value='Matar'>"
 echo "        </form>"
 echo "    </body>"
 echo "</html>"
-

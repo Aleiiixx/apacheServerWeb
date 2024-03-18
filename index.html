@@ -1,60 +1,31 @@
 #!/bin/bash
 
-if [ "$REQUEST_METHOD" = "POST" ]; then
-    read -r CONTENT_LENGTH
-    read -r QUERY_STRING
-    read -r POST_DATA
-    pid=$(echo "$POST_DATA" | grep -oP "(?<=pid=)[^&]+")
-    if [ -n "$pid" ]; then
-        sudo kill -9 "$pid"
-        cat <<HTML
-Content-type: text/html
-
-<html>
-    <head>
-        <title>Mi primera pagina dinamica</title>
-    </head>
-    <body>
-        <h1>Proceso con PID $pid ha sido terminado.</h1>
-        <a href='$SCRIPT_NAME'>Volver</a>
-    </body>
-</html>
-HTML
-    else
-        cat <<HTML
-Content-type: text/html
-
-<html>
-    <head>
-        <title>Mi primera pagina dinamica</title>
-    </head>
-    <body>
-        <h1>Error: PID no proporcionado.</h1>
-        <a href='$SCRIPT_NAME'>Volver</a>
-    </body>
-</html>
-HTML
-    fi
-else
-    cat <<HTML
-Content-type: text/html
-
-<html>
-    <head>
-        <title>Mi primera pagina dinamica</title>
-    </head>
-    <body>
-        <h1>Lista de procesos:</h1>
-        <pre>
-$(ps aux)
-        </pre>
-        <h2>Matar Proceso</h2>
-        <form action='$SCRIPT_NAME' method='POST'>
-            <label for='pid'>PID:</label>
-            <input type='text' id='pid' name='pid'>
-            <input type='submit' value='Matar' name='submit'>
-        </form>
-    </body>
-</html>
-HTML
+# Determina si el método de solicitud es POST
+# En ese caso, leerá la entrada de datos del formulario
+read method path query <<<$(echo $REQUEST_METHOD $PATH_INFO $QUERY_STRING)
+if [ "$method" = "POST" ]; then
+    read -n $CONTENT_LENGTH post_data
+    # Extracción del PID del contenido de post_data
+    # Asumiendo que el nombre del campo del formulario es 'pid'
+    pid=$(echo $post_data | sed 's/pid=//')
+    # Comando para matar el proceso
+    kill $pid
 fi
+
+echo "Content-type: text/html"
+echo ""
+echo "<html>"
+echo "    <head>"
+echo "        <title>Mi primera pagina dinamica</title>"
+echo "    </head>"
+echo "    <body>"
+echo "        <pre>"
+ps aux
+echo "        </pre>"
+echo "        <form method='POST' action='/cgi-bin/tu_script.cgi'>"
+echo "            <label for='pid'>PID:</label>"
+echo "            <input type='text' id='pid' name='pid'>"
+echo "            <input type='submit' value='Matar'>"
+echo "        </form>"
+echo "    </body>"
+echo "</html>"

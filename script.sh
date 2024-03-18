@@ -36,7 +36,7 @@ echo "        <h3>Tiempo encendido (uptime):</h3>"
 echo "        <pre>"
 uptime
 echo "        </pre>"
-echo "        <h3>Últimos 10 logins:</h3>"
+echo "        <h3>Ultimos 10 logins:</h3>"
 echo "        <pre>"
 last -n 10
 echo "        </pre>"

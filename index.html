@@ -1,37 +1,60 @@
 #!/bin/bash
 
-echo "Content-type: text/html"
-echo -e "
+if [ "$REQUEST_METHOD" = "POST" ]; then
+    read -r CONTENT_LENGTH
+    read -r QUERY_STRING
+    read -r POST_DATA
+    pid=$(echo "$POST_DATA" | grep -oP "(?<=pid=)[^&]+")
+    if [ -n "$pid" ]; then
+        kill -9 "$pid"
+        cat <<HTML
+Content-type: text/html
+
 <html>
     <head>
         <title>Mi primera pagina dinamica</title>
-        <script>
-            function killProcess(pid) {
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        alert(xhr.responseText);
-                    }
-                };
-                xhr.open('GET', 'kill_process.sh?pid=' + pid, true);
-                xhr.send();
-            }
-        </script>
     </head>
     <body>
-        <pre>
-"
-
-# Obtener la lista de procesos y procesar cada línea
-ps aux | while read -r line; do
-    # Obtener el PID (identificador del proceso)
-    pid=$(echo "$line" | awk '{print $2}')
-    # Imprimir la línea del proceso y un botón "kill"
-    echo "$line <button onclick=\"killProcess($pid)\">Kill</button>"
-done
-
-echo -e "  
-        </pre>
+        <h1>Proceso con PID $pid ha sido terminado.</h1>
+        <a href='$SCRIPT_NAME'>Volver</a>
     </body>
 </html>
-"
+HTML
+    else
+        cat <<HTML
+Content-type: text/html
+
+<html>
+    <head>
+        <title>Mi primera pagina dinamica</title>
+    </head>
+    <body>
+        <h1>Error: PID no proporcionado.</h1>
+        <a href='$SCRIPT_NAME'>Volver</a>
+    </body>
+</html>
+HTML
+    fi
+else
+    cat <<HTML
+Content-type: text/html
+
+<html>
+    <head>
+        <title>Mi primera pagina dinamica</title>
+    </head>
+    <body>
+        <h1>Lista de procesos:</h1>
+        <pre>
+$(ps aux)
+        </pre>
+        <h2>Matar Proceso</h2>
+        <form action='$SCRIPT_NAME' method='POST'>
+            <label for='pid'>PID:</label>
+            <input type='text' id='pid' name='pid'>
+            <input type='submit' value='Matar' name='submit'>
+        </form>
+    </body>
+</html>
+HTML
+fi

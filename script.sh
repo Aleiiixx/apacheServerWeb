@@ -15,7 +15,7 @@ echo "        <title>Mi primera pagina dinamica</title>"
 echo "    </head>"
 echo "    <body>"
 echo "        <pre>"
-ps aux
+ps aux | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
 echo "        </pre>"
 echo "        <form method='POST' action='/cgi-bin/script.sh'>"
 echo "            <label for='pid'>PID:</label>"

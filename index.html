@@ -1,31 +1,36 @@
 #!/bin/bash
 
 # Determina si el método de solicitud es POST
-# En ese caso, leerá la entrada de datos del formulario
-read method path query <<<$(echo $REQUEST_METHOD $PATH_INFO $QUERY_STRING)
-if [ "$method" = "POST" ]; then
+if [ "$REQUEST_METHOD" = "POST" ]; then
     read -n $CONTENT_LENGTH post_data
-    # Extracción del PID del contenido de post_data
-    # Asumiendo que el nombre del campo del formulario es 'pid'
     pid=$(echo $post_data | sed 's/pid=//')
-    # Comando para matar el proceso
-    kill $pid
+    echo "Intentando matar PID: $pid" >&2 # Esto se escribirá en el log de errores del servidor web
+    kill $pid 2>&1
+    kill_result=$?
+    if [ $kill_result -eq 0 ]; then
+        echo "PID $pid terminado con éxito." >&2
+    else
+        echo "Error al terminar PID $pid." >&2
+    fi
 fi
 
 echo "Content-type: text/html"
 echo ""
-echo "<html>"
-echo "    <head>"
-echo "        <title>Mi primera pagina dinamica</title>"
-echo "    </head>"
-echo "    <body>"
-echo "        <pre>"
-ps aux
-echo "        </pre>"
-echo "        <form method='POST' action='/cgi-bin/script.sh'>"
-echo "            <label for='pid'>PID:</label>"
-echo "            <input type='text' id='pid' name='pid'>"
-echo "            <input type='submit' value='Matar'>"
-echo "        </form>"
-echo "    </body>"
-echo "</html>"
+
+cat <<EOF
+<html>
+    <head>
+        <title>Mi primera pagina dinamica</title>
+    </head>
+    <body>
+        <pre>
+$(ps aux)
+        </pre>
+        <form method='POST' action='/cgi-bin/script.sh'>
+            <label for='pid'>PID:</label>
+            <input type='text' id='pid' name='pid'>
+            <input type='submit' value='Matar'>
+        </form>
+    </body>
+</html>
+EOF

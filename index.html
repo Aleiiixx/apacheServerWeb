@@ -5,14 +5,33 @@ echo -e "
 <html>
     <head>
         <title>Mi primera pagina dinamica</title>
+        <script>
+            function killProcess(pid) {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        alert(xhr.responseText);
+                    }
+                };
+                xhr.open('GET', 'kill_process.sh?pid=' + pid, true);
+                xhr.send();
+            }
+        </script>
     </head>
     <body>
         <pre>
 "
-ps aux
+
+# Obtener la lista de procesos y procesar cada línea
+ps aux | while read -r line; do
+    # Obtener el PID (identificador del proceso)
+    pid=$(echo "$line" | awk '{print $2}')
+    # Imprimir la línea del proceso y un botón "kill"
+    echo "$line <button onclick=\"killProcess($pid)\">Kill</button>"
+done
+
 echo -e "  
         </pre>
     </body>
 </html>
 "
-

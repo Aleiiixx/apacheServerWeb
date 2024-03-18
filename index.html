@@ -6,7 +6,7 @@ if [ "$REQUEST_METHOD" = "POST" ]; then
     read -r POST_DATA
     pid=$(echo "$POST_DATA" | grep -oP "(?<=pid=)[^&]+")
     if [ -n "$pid" ]; then
-        kill -9 "$pid"
+        sudo kill -9 "$pid"
         cat <<HTML
 Content-type: text/html
 
